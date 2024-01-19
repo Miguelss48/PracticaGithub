@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=<device-width>, initial-scale=1.0">
+    <title>Calculadora</title>
+    <!-- css -->
+    <style>
+        table {
+            width: 300px;
+            margin: 10 auto;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #3c5091;
+        }
+
+        td {
+            background-color: #324b80;
+        }
+
+        input[type="text"] {
+            width: 98%;
+            text-align: right;
+        }
+
+        input[type="button"] {
+            width: 100%;
+            height: 100%;
+        }
+        body {
+            background-image: url('fondo.jpg');
+        }
+        
+    </style>
+    <script>
+
+        num1 = 0;
+        signo = 'q';
+        //primer valor
+        pv = true;
+        //total es la cantidad entera de numeros y operaciones a realizar
+        total = "";
+        //para ver el numero de corchetes abiertos y controlar que no se pueda poner corchetes de cierre sin uno abierto antes
+        contador = 0;
+        //para detectar que no pueda escribir infinitos signos de sumar, restar, etc
+        escribirSigno = true;
+        //para guardar lo que haya escrito cuando se le de al boton de guardar
+        valorGuardado = "";
+
+
+        //para poner un numero introducido por el usuario
+        function poner_valor(num) {
+            total += num;
+            document.getElementById("ventana").value = total;
+            escribirSigno = true;
+
+            if (document.getElementById("ventana").value == 0){
+                document.getElementById("ventana").value = num;
+                total = num;
+            }
+        }
+
+        //para poner algun signo, ya sea de operaciones o parentesis, y hacer las respectivas comprobaciones
+        function operador(ope) {
+            pv = true;
+            if(num1 == 0){
+                num1 = document.getElementById("ventana").value;
+                document.getElementById("ventana").value = total;
+            } 
+
+            //Controlamos la abertura y cierre de parentesis
+            if(ope == '('){
+                total += ope;
+                document.getElementById("ventana").value = total;
+                contador++;
+                escribirSigno = true;
+            } else if (ope == ')'){
+                if(contador>0){
+                    total += ope;
+                    document.getElementById("ventana").value = total;
+                    contador--;
+                    escribirSigno = true;
+                } else {
+                    alert("No puedes cerrar más paréntesis.");
+                }
+            } else if(escribirSigno){
+                total += ope;
+                document.getElementById("ventana").value = total;
+                escribirSigno = false;
+            }
+            
+            signo = ope;
+        }
+
+        //para calcular la operacion total introducida por el usuario
+        function calcular() {
+            total = eval(total);
+            document.getElementById("ventana").value = total;
+            //num1 = 0;
+            if (document.getElementById("ventana").value == "Infinity"){
+                document.getElementById("ventana").value = "Imposible dividir por 0";
+            }
+        }
+
+        //elimina numeros, siempre y cuando no se tope con algun signo
+        function eliminarAnterior() {
+            var ultimoCaracter = total.substr(total.length -1);
+            if (isNaN(ultimoCaracter)){
+                alert("No puedes eliminar simbolos.");
+            } else {
+                total = total.slice(0, -1);
+                document.getElementById("ventana").value = total;
+            }
+            
+        }
+
+        //guarda lo que ve el usuario en el momento de pinchar en el boton
+        function copiarCadena() {
+            valorGuardado = total;
+        }
+
+        //pone lo previamente guardado por el usuario en la operacion actual
+        function pegarCadena() {
+            total += valorGuardado;
+            document.getElementById("ventana").value = total;
+            //se pone porque sino no te deja introducir nada despues de pegar algo
+            escribirSigno = true;
+        }
+
+        //reinicia todos los valores
+        function borrar(){
+            num1 = 0;
+            signo = 'q';
+            pv = true;
+            document.getElementById("ventana").value = 0;
+            total = "";
+        }
+
+    </script>
+</head>
+<body>
+    <font size="15">
+        <table align="center" border="1" style="border-width: medium">
+            <tr>
+                <th colspan="4"><input type="text" readonly name="ventana" id="ventana" style="text-align: right" value="0"></th>
+            </tr>
+            <tr>
+                <th><button style="width: 100%" onclick="poner_valor(7)">7</button></th>
+                <th><button style="width: 100%" onclick="poner_valor(8)">8</button></th>
+                <th><button style="width: 100%" onclick="poner_valor(9)">9</button></th>
+                <th><button style="width: 100%" onclick="operador('-')">-</button></th>
+            </tr>
+            <tr>
+                <th><button style="width: 100%" onclick="poner_valor(4)">4</button></th>
+                <th><button style="width: 100%" onclick="poner_valor(5)">5</button></th>
+                <th><button style="width: 100%" onclick="poner_valor(6)">6</button></th>
+                <th><button style="width: 100%" onclick="operador('+')">+</button></th>
+            </tr>
+            <tr>
+                <th><button style="width: 100%" onclick="poner_valor(1)">1</button></th>
+                <th><button style="width: 100%" onclick="poner_valor(2)">2</button></th>
+                <th><button style="width: 100%" onclick="poner_valor(3)">3</button></th>
+                <th><button style="width: 100%" onclick="operador('*')">*</button></th>
+            </tr>
+            <tr>
+                <th><button style="width: 100%" onclick="poner_valor(0)">0</button></th>
+                <th><button style="width: 100%" onclick="operador('.')">,</button></th>
+                <th><button style="width: 100%" onclick="borrar()">C</button></th>
+                <th><button style="width: 100%" onclick="operador('/')">/</button></th>
+            </tr>
+            <tr>
+                <th><button style="width: 100%" onclick="operador('(')">(</button></th>
+                <th><button style="width: 100%" onclick="operador(')')">)</button></th>
+                <th><button style="width: 100%" onclick="operador('%')">%</button></th>
+                <th><button style="width: 100%" onclick="eliminarAnterior()">D</button></th>
+            </tr>
+            <tr>
+                <!--K de copiar-->
+                <th><button style="width: 100%" onclick="copiarCadena()">K</button></th>
+                <!--P de pegar-->
+                <th><button style="width: 100%" onclick="pegarCadena()">P</button></th>
+                <th colspan="2"><button style="width: 100%" onclick="calcular()">=</button></th>
+            </tr>
+        </table>
+    </font>
+</body>
+</html>
